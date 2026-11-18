@@ -21,7 +21,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "docs": "node scripts/generate-api-docs.js",
+    "docs:check": "node scripts/generate-api-docs.js --check"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -37,6 +39,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@apidevtools/swagger-parser": "^13.0.0",
     "@eslint/js": "^10.0.1",
     "@jest/globals": "^30.5.2",
     "cross-env": "^10.1.0",
