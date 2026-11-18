@@ -7,7 +7,7 @@
 ## Công nghệ
 
 - **Backend:** Node.js, Express.js, PostgreSQL (`pg`), JWT, bcrypt
-- **Frontend:** React (Vite)
+- **Frontend:** React 19 (Vite), React Router, Axios, CSS thuần
 - **Testing:** Jest, Supertest
 - **Docs:** Swagger / OpenAPI
 - **DevOps:** Docker Compose, GitHub Actions
@@ -62,6 +62,29 @@ Tài khoản demo sau khi seed (mật khẩu `password123`): `owner@taskflow.dev
 | `npm run seed`         | Reset database dev và nạp dữ liệu demo               |
 | `npm run docs`         | Validate OpenAPI và sinh `docs/api-specification.md` |
 
+## Chạy frontend
+
+Cần backend đang chạy ở cổng 3000. Vite proxy `/api` sang backend nên frontend và API cùng origin,
+cookie đăng nhập `httpOnly` hoạt động mà không cần cấu hình CORS.
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:5173
+```
+
+| Lệnh            | Mô tả                        |
+| --------------- | ---------------------------- |
+| `npm run dev`   | Dev server với hot reload    |
+| `npm test`      | Vitest + Testing Library     |
+| `npm run lint`  | ESLint                       |
+| `npm run build` | Build production vào `dist/` |
+
+Tính năng: đăng ký/đăng nhập, danh sách và chi tiết workspace (thống kê, quản lý thành viên và vai trò),
+project với thanh tiến độ, Kanban board kéo thả để đổi trạng thái, tạo/sửa/xóa task, giao task,
+tìm kiếm, lọc theo người phụ trách, sắp xếp, phân trang từng cột, bình luận và lịch sử thay đổi.
+Các nút chỉ hiện khi vai trò hiện tại được phép thực hiện; mọi quyền vẫn được backend kiểm tra.
+
 ## Chạy bằng Docker
 
 Chạy cả backend và PostgreSQL trong container (backend tự chạy migration khi khởi động):
@@ -80,6 +103,7 @@ GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy t
 
 - ESLint, Prettier check, kiểm tra `docs/api-specification.md` khớp với OpenAPI spec
 - Toàn bộ unit và integration test với PostgreSQL service, kèm báo cáo coverage
+- Frontend: ESLint, Prettier check, Vitest và build production
 - Build Docker image của backend
 
 ## API
