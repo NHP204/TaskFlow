@@ -139,19 +139,19 @@ Vite proxy `/api` sang `localhost:3000`, nên khi phát triển frontend và API
 
 ### Lệnh
 
-| Thư mục  | Lệnh                    | Mô tả                                                 |
-| -------- | ----------------------- | ----------------------------------------------------- |
-| backend  | `npm run dev`           | Chạy API với nodemon                                  |
-| backend  | `npm test`              | Unit + integration test trên database `taskflow_test` |
-| backend  | `npm run test:coverage` | Test kèm báo cáo coverage                             |
-| backend  | `npm run migrate`       | Áp dụng migration (`migrate:down` để rollback)        |
-| backend  | `npm run seed`          | Reset database dev và nạp dữ liệu demo                |
-| backend  | `npm run docs`          | Validate OpenAPI và sinh `docs/api-specification.md`  |
-| backend  | `npm run lint`          | ESLint (`format` / `format:check` cho Prettier)       |
-| frontend | `npm run dev`           | Dev server                                            |
-| frontend | `npm test`              | Vitest + Testing Library                              |
-| frontend | `npm run build`         | Build production vào `dist/`                          |
-| frontend | `npm run lint`          | ESLint                                                |
+| Thư mục  | Lệnh                    | Mô tả                                                    |
+| -------- | ----------------------- | -------------------------------------------------------- |
+| backend  | `npm run dev`           | Chạy API, tự khởi động lại khi sửa code (`node --watch`) |
+| backend  | `npm test`              | Unit + integration test trên database `taskflow_test`    |
+| backend  | `npm run test:coverage` | Test kèm báo cáo coverage                                |
+| backend  | `npm run migrate`       | Áp dụng migration (`migrate:down` để rollback)           |
+| backend  | `npm run seed`          | Reset database dev và nạp dữ liệu demo                   |
+| backend  | `npm run docs`          | Validate OpenAPI và sinh `docs/api-specification.md`     |
+| backend  | `npm run lint`          | ESLint (`format` / `format:check` cho Prettier)          |
+| frontend | `npm run dev`           | Dev server                                               |
+| frontend | `npm test`              | Vitest + Testing Library                                 |
+| frontend | `npm run build`         | Build production vào `dist/`                             |
+| frontend | `npm run lint`          | ESLint                                                   |
 
 ### Biến môi trường (backend)
 
@@ -255,7 +255,20 @@ hoặc đổi vai trò. Khi một thành viên bị xóa, các task đang giao c
 - **Frontend:** test cho form đăng nhập, logic Kanban (cập nhật lạc quan và rollback), quyền hiển thị,
   định dạng.
 - **GitHub Actions** chạy trên mọi push và pull request: lint, Prettier, kiểm tra tài liệu API khớp
-  spec, test backend với PostgreSQL service kèm coverage, test và build frontend, build Docker image.
+  spec, test backend với PostgreSQL service kèm coverage, test và build frontend, build Docker image,
+  và `npm audit --omit=dev` (CI fail nếu dependency production có lỗ hổng từ mức moderate).
+
+### Bảo mật dependency
+
+- Dependency production của backend và frontend: `npm audit --omit=dev` báo **0 lỗ hổng**.
+- `glob` và `minimatch` (dùng bởi `node-pg-migrate`) được ép lên bản đã vá bằng `overrides` trong
+  `backend/package.json`.
+- Backend dùng `node --watch` thay cho nodemon, bớt một nhóm dependency.
+- `npm audit` đầy đủ vẫn báo lỗ hổng high
+  [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) (ReDoS trong `picomatch`)
+  qua Jest, Vite và Vitest. Advisory này **chưa có bản vá**. Các công cụ này chỉ chạy khi phát triển,
+  build và test, xử lý glob pattern từ cấu hình của dự án chứ không nhận input từ người dùng, và không
+  có trong image production hay bundle frontend. Sẽ cập nhật khi `picomatch` phát hành bản sửa.
 
 ## Ảnh chụp màn hình
 
