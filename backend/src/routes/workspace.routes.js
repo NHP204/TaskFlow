@@ -12,6 +12,7 @@ import {
 export default function createWorkspaceRouter({
   workspaceController: c,
   projectController,
+  statsController,
   authenticate,
 }) {
   const router = Router();
@@ -29,6 +30,7 @@ export default function createWorkspaceRouter({
   router.delete('/:id/members/:userId', validate(memberSchema), c.removeMember);
 
   router.get('/:id/projects', validate(workspaceIdSchema), projectController.listByWorkspace);
+  router.get('/:id/stats', validate(workspaceIdSchema), statsController.workspace);
 
   return router;
 }

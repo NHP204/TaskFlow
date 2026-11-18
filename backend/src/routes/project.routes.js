@@ -10,6 +10,7 @@ import { listTasksSchema } from '../validators/task.validator.js';
 export default function createProjectRouter({
   projectController: c,
   taskController,
+  statsController,
   authenticate,
 }) {
   const router = Router();
@@ -22,6 +23,7 @@ export default function createProjectRouter({
   router.delete('/:id', validate(projectIdSchema), c.delete);
 
   router.get('/:id/tasks', validate(listTasksSchema), taskController.listByProject);
+  router.get('/:id/stats', validate(projectIdSchema), statsController.project);
 
   return router;
 }

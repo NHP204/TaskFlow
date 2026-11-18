@@ -36,18 +36,29 @@ cp .env.test.example .env.test
 # 3. Tạo bảng
 npm run migrate
 
-# 4. Chạy server (http://localhost:3000/api/v1/health)
+# 4. (Tùy chọn) Nạp dữ liệu demo — xóa toàn bộ dữ liệu dev hiện có
+npm run seed
+
+# 5. Chạy server
 npm run dev
 ```
 
-| Lệnh                   | Mô tả                                             |
-| ---------------------- | ------------------------------------------------- |
-| `npm run dev`          | Chạy server với nodemon                           |
-| `npm run migrate`      | Áp dụng migration                                 |
-| `npm run migrate:down` | Rollback migration gần nhất                       |
-| `npm test`             | Chạy toàn bộ test (dùng database `taskflow_test`) |
-| `npm run lint`         | Kiểm tra ESLint                                   |
-| `npm run format`       | Format code bằng Prettier                         |
+- API: http://localhost:3000/api/v1
+- Swagger UI: http://localhost:3000/api-docs
+
+Tài khoản demo sau khi seed (mật khẩu `password123`): `owner@taskflow.dev`, `admin@taskflow.dev`,
+`dev@taskflow.dev`, `designer@taskflow.dev`, và `guest@taskflow.dev` (không thuộc workspace nào).
+
+| Lệnh                   | Mô tả                                                |
+| ---------------------- | ---------------------------------------------------- |
+| `npm run dev`          | Chạy server với nodemon                              |
+| `npm run migrate`      | Áp dụng migration                                    |
+| `npm run migrate:down` | Rollback migration gần nhất                          |
+| `npm test`             | Chạy toàn bộ test (dùng database `taskflow_test`)    |
+| `npm run lint`         | Kiểm tra ESLint                                      |
+| `npm run format`       | Format code bằng Prettier                            |
+| `npm run seed`         | Reset database dev và nạp dữ liệu demo               |
+| `npm run docs`         | Validate OpenAPI và sinh `docs/api-specification.md` |
 
 ## API
 
@@ -78,6 +89,12 @@ Base URL: `/api/v1`. Endpoint cần đăng nhập gửi header `Authorization: B
 | PATCH  | `/tasks/:id`                      | ✓    | Cập nhật task (quản lý, người tạo, người được giao) |
 | DELETE | `/tasks/:id`                      | ✓    | Xóa task (quản lý, người tạo)                       |
 | GET    | `/tasks/:id/activity`             | ✓    | Lịch sử thay đổi của task                           |
+| GET    | `/tasks/:id/comments`             | ✓    | Danh sách bình luận                                 |
+| POST   | `/tasks/:id/comments`             | ✓    | Thêm bình luận                                      |
+| PATCH  | `/comments/:id`                   | ✓    | Sửa bình luận (tác giả)                             |
+| DELETE | `/comments/:id`                   | ✓    | Xóa bình luận (tác giả, OWNER, ADMIN)               |
+| GET    | `/projects/:id/stats`             | ✓    | Thống kê task theo trạng thái, tiến độ, quá hạn     |
+| GET    | `/workspaces/:id/stats`           | ✓    | Thống kê workspace và tiến độ từng project          |
 
 ### Query của `GET /projects/:id/tasks`
 
@@ -111,5 +128,6 @@ OWNER không thể bị xóa hoặc đổi vai trò. User không phải thành v
 
 - [Đặc tả dự án](docs/project-specification.md)
 - [Thiết kế database (ERD)](docs/erd.md)
+- [API specification](docs/api-specification.md) (sinh từ OpenAPI, bản tương tác tại `/api-docs`)
 
 > README sẽ được hoàn thiện ở các giai đoạn sau (cài đặt, chạy dự án, biến môi trường, demo).
