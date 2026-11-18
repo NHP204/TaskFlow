@@ -139,19 +139,19 @@ Vite proxy `/api` sang `localhost:3000`, nên khi phát triển frontend và API
 
 ### Lệnh
 
-| Thư mục  | Lệnh                    | Mô tả                                                 |
-| -------- | ----------------------- | ----------------------------------------------------- |
-| backend  | `npm run dev`           | Chạy API với nodemon                                  |
-| backend  | `npm test`              | Unit + integration test trên database `taskflow_test` |
-| backend  | `npm run test:coverage` | Test kèm báo cáo coverage                             |
-| backend  | `npm run migrate`       | Áp dụng migration (`migrate:down` để rollback)        |
-| backend  | `npm run seed`          | Reset database dev và nạp dữ liệu demo                |
-| backend  | `npm run docs`          | Validate OpenAPI và sinh `docs/api-specification.md`  |
-| backend  | `npm run lint`          | ESLint (`format` / `format:check` cho Prettier)       |
-| frontend | `npm run dev`           | Dev server                                            |
-| frontend | `npm test`              | Vitest + Testing Library                              |
-| frontend | `npm run build`         | Build production vào `dist/`                          |
-| frontend | `npm run lint`          | ESLint                                                |
+| Thư mục  | Lệnh                    | Mô tả                                                    |
+| -------- | ----------------------- | -------------------------------------------------------- |
+| backend  | `npm run dev`           | Chạy API, tự khởi động lại khi sửa code (`node --watch`) |
+| backend  | `npm test`              | Unit + integration test trên database `taskflow_test`    |
+| backend  | `npm run test:coverage` | Test kèm báo cáo coverage                                |
+| backend  | `npm run migrate`       | Áp dụng migration (`migrate:down` để rollback)           |
+| backend  | `npm run seed`          | Reset database dev và nạp dữ liệu demo                   |
+| backend  | `npm run docs`          | Validate OpenAPI và sinh `docs/api-specification.md`     |
+| backend  | `npm run lint`          | ESLint (`format` / `format:check` cho Prettier)          |
+| frontend | `npm run dev`           | Dev server                                               |
+| frontend | `npm test`              | Vitest + Testing Library                                 |
+| frontend | `npm run build`         | Build production vào `dist/`                             |
+| frontend | `npm run lint`          | ESLint                                                   |
 
 ### Biến môi trường (backend)
 
