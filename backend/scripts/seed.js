@@ -1,12 +1,15 @@
 // Resets the database and inserts demo data through the services.
-// Usage: npm run seed   (refuses to run with NODE_ENV=production)
+// Usage: npm run seed
+// With NODE_ENV=production (e.g. the Docker image) it also requires ALLOW_SEED=true.
 import env from '../src/config/env.js';
 import db from '../src/config/database.js';
 import createContainer from '../src/container.js';
 import { toDateString } from '../src/utils/date.js';
 
-if (env.isProduction) {
-  console.error('Refusing to seed a production database.');
+if (env.isProduction && process.env.ALLOW_SEED !== 'true') {
+  console.error(
+    'Refusing to seed with NODE_ENV=production. Set ALLOW_SEED=true for a demo database.',
+  );
   process.exit(1);
 }
 

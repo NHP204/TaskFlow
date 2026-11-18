@@ -83,8 +83,9 @@ jobs:
       - run: npm run build
 
   docker:
-    name: Backend Docker image
+    name: Docker images
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t taskflow-backend:ci backend
+      - run: docker build -t taskflow-frontend:ci frontend

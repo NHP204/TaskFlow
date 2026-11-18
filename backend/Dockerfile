@@ -11,7 +11,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json ./
 COPY src ./src
 COPY migrations ./migrations
-COPY scripts/migrate.js ./scripts/migrate.js
+COPY scripts/migrate.js scripts/seed.js ./scripts/
 
 USER node
 EXPOSE 3000
