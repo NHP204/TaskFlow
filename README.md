@@ -53,20 +53,46 @@ npm run dev
 
 Base URL: `/api/v1`. Endpoint cần đăng nhập gửi header `Authorization: Bearer <accessToken>`.
 
-| Method | Endpoint                          | Auth | Mô tả                                     |
-| ------ | --------------------------------- | ---- | ----------------------------------------- |
-| GET    | `/health`                         |      | Kiểm tra server và database               |
-| POST   | `/auth/register`                  |      | Đăng ký                                   |
-| POST   | `/auth/login`                     |      | Đăng nhập, nhận JWT                       |
-| GET    | `/auth/me`                        | ✓    | Thông tin user hiện tại                   |
-| POST   | `/workspaces`                     | ✓    | Tạo workspace (người tạo là OWNER)        |
-| GET    | `/workspaces`                     | ✓    | Danh sách workspace của user              |
-| GET    | `/workspaces/:id`                 | ✓    | Chi tiết workspace và thành viên          |
-| PATCH  | `/workspaces/:id`                 | ✓    | Cập nhật (OWNER, ADMIN)                   |
-| DELETE | `/workspaces/:id`                 | ✓    | Xóa (OWNER)                               |
-| POST   | `/workspaces/:id/members`         | ✓    | Thêm thành viên theo email (OWNER, ADMIN) |
-| PATCH  | `/workspaces/:id/members/:userId` | ✓    | Đổi vai trò (OWNER)                       |
-| DELETE | `/workspaces/:id/members/:userId` | ✓    | Xóa thành viên hoặc tự rời workspace      |
+| Method | Endpoint                          | Auth | Mô tả                                               |
+| ------ | --------------------------------- | ---- | --------------------------------------------------- |
+| GET    | `/health`                         |      | Kiểm tra server và database                         |
+| POST   | `/auth/register`                  |      | Đăng ký                                             |
+| POST   | `/auth/login`                     |      | Đăng nhập, nhận JWT                                 |
+| GET    | `/auth/me`                        | ✓    | Thông tin user hiện tại                             |
+| POST   | `/workspaces`                     | ✓    | Tạo workspace (người tạo là OWNER)                  |
+| GET    | `/workspaces`                     | ✓    | Danh sách workspace của user                        |
+| GET    | `/workspaces/:id`                 | ✓    | Chi tiết workspace và thành viên                    |
+| PATCH  | `/workspaces/:id`                 | ✓    | Cập nhật (OWNER, ADMIN)                             |
+| DELETE | `/workspaces/:id`                 | ✓    | Xóa (OWNER)                                         |
+| POST   | `/workspaces/:id/members`         | ✓    | Thêm thành viên theo email (OWNER, ADMIN)           |
+| PATCH  | `/workspaces/:id/members/:userId` | ✓    | Đổi vai trò (OWNER)                                 |
+| DELETE | `/workspaces/:id/members/:userId` | ✓    | Xóa thành viên hoặc tự rời workspace                |
+| GET    | `/workspaces/:id/projects`        | ✓    | Danh sách project của workspace                     |
+| POST   | `/projects`                       | ✓    | Tạo project (OWNER, ADMIN)                          |
+| GET    | `/projects/:id`                   | ✓    | Chi tiết project                                    |
+| PATCH  | `/projects/:id`                   | ✓    | Cập nhật project (OWNER, ADMIN)                     |
+| DELETE | `/projects/:id`                   | ✓    | Xóa project (OWNER, ADMIN)                          |
+| GET    | `/projects/:id/tasks`             | ✓    | Danh sách task: lọc, tìm kiếm, sắp xếp, phân trang  |
+| POST   | `/tasks`                          | ✓    | Tạo task                                            |
+| GET    | `/tasks/:id`                      | ✓    | Chi tiết task                                       |
+| PATCH  | `/tasks/:id`                      | ✓    | Cập nhật task (quản lý, người tạo, người được giao) |
+| DELETE | `/tasks/:id`                      | ✓    | Xóa task (quản lý, người tạo)                       |
+| GET    | `/tasks/:id/activity`             | ✓    | Lịch sử thay đổi của task                           |
+
+### Query của `GET /projects/:id/tasks`
+
+| Tham số            | Ví dụ         | Mô tả                                                  |
+| ------------------ | ------------- | ------------------------------------------------------ |
+| `status`           | `IN_PROGRESS` | `TODO`, `IN_PROGRESS` hoặc `DONE`                      |
+| `assigneeId`       | `5`           | Người phụ trách                                        |
+| `dueDate`          | `2026-12-31`  | Đúng ngày deadline                                     |
+| `dueFrom`, `dueTo` | `2026-12-01`  | Khoảng deadline (bao gồm hai đầu)                      |
+| `search`           | `login`       | Tìm trong tiêu đề và mô tả, không phân biệt hoa thường |
+| `sortBy`           | `dueDate`     | `createdAt`, `updatedAt`, `dueDate`, `title`, `status` |
+| `order`            | `asc`         | `asc` hoặc `desc` (mặc định `desc`)                    |
+| `page`, `limit`    | `1`, `20`     | Phân trang, `limit` tối đa 100                         |
+
+Response danh sách có thêm `meta: { page, limit, total, totalPages }`.
 
 ### Phân quyền trong workspace
 

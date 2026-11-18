@@ -18,6 +18,7 @@ describe('workspaceService', () => {
   let workspaceRepository;
   let memberRepository;
   let userRepository;
+  let taskRepository;
   let service;
   const client = { name: 'tx-client' };
 
@@ -41,10 +42,13 @@ describe('workspaceService', () => {
       ),
     };
 
+    taskRepository = { unassignUserInWorkspace: jest.fn() };
+
     service = createWorkspaceService({
       workspaceRepository,
       memberRepository,
       userRepository,
+      taskRepository,
       workspaceAccess: createWorkspaceAccess({ workspaceRepository, memberRepository }),
       runInTransaction: (work) => work(client),
     });
@@ -153,7 +157,8 @@ describe('workspaceService', () => {
       ['ADMIN leaves', ADMIN_ID, ADMIN_ID],
     ])('allows: %s', async (_label, actorId, targetId) => {
       await service.removeMember(actorId, WS_ID, targetId);
-      expect(memberRepository.remove).toHaveBeenCalledWith(WS_ID, targetId);
+      expect(memberRepository.remove).toHaveBeenCalledWith(WS_ID, targetId, client);
+      expect(taskRepository.unassignUserInWorkspace).toHaveBeenCalledWith(WS_ID, targetId, client);
     });
 
     it.each([
