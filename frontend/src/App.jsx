@@ -4,6 +4,7 @@ import { GuestRoute, ProtectedRoute } from './components/common/RouteGuards.jsx'
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import WorkspacesPage from './pages/WorkspacesPage.jsx';
+import WorkspaceDetailPage from './pages/WorkspaceDetailPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/workspaces" replace />} />
           <Route path="/workspaces" element={<WorkspacesPage />} />
+          <Route path="/workspaces/:workspaceId" element={<WorkspaceDetailPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
