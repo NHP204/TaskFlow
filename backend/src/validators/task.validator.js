@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { id, idParams } from './common.validator.js';
+import { id, idParams, pagination, paginationQuery } from './common.validator.js';
 
 export const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'DONE'];
 export const TASK_SORT_FIELDS = ['createdAt', 'updatedAt', 'dueDate', 'title', 'status'];
@@ -22,11 +22,6 @@ const description = Joi.string().trim().max(5000).allow('', null);
 const status = Joi.string()
   .valid(...TASK_STATUSES)
   .messages({ 'any.only': `status must be one of ${TASK_STATUSES.join(', ')}` });
-
-const pagination = {
-  page: Joi.number().integer().min(1).default(1),
-  limit: Joi.number().integer().min(1).max(100).default(20),
-};
 
 export const taskIdSchema = { params: idParams };
 
@@ -71,5 +66,5 @@ export const listTasksSchema = {
 
 export const taskActivitySchema = {
   params: idParams,
-  query: Joi.object(pagination),
+  query: paginationQuery,
 };

@@ -4,6 +4,7 @@ import createAuthRouter from './auth.routes.js';
 import createWorkspaceRouter from './workspace.routes.js';
 import createProjectRouter from './project.routes.js';
 import createTaskRouter from './task.routes.js';
+import createCommentRouter from './comment.routes.js';
 
 export default function createApiRouter(container) {
   const router = Router();
@@ -13,6 +14,7 @@ export default function createApiRouter(container) {
   router.use('/workspaces', createWorkspaceRouter(container));
   router.use('/projects', createProjectRouter(container));
   router.use('/tasks', createTaskRouter(container));
+  router.use('/comments', createCommentRouter(container));
 
   return router;
 }

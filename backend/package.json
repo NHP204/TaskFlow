@@ -33,7 +33,8 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.12.1",
     "node-pg-migrate": "^9.0.0",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
