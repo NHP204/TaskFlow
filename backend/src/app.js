@@ -2,12 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 
 import openapi from './docs/openapi.js';
 import createContainer from './container.js';
 import createApiRouter from './routes/index.js';
 import notFound from './middlewares/notFound.js';
+import createCheckOrigin from './middlewares/checkOrigin.js';
 import createErrorHandler from './middlewares/errorHandler.js';
 
 /** Builds the Express app with injected dependencies. */
@@ -21,8 +23,11 @@ export default function createApp({ db, env, logger = console }) {
       contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } },
     }),
   );
-  app.use(cors({ origin: env.corsOrigins.length > 0 ? env.corsOrigins : false }));
+  app.use(
+    cors({ origin: env.corsOrigins.length > 0 ? env.corsOrigins : false, credentials: true }),
+  );
   app.use(express.json({ limit: '100kb' }));
+  app.use(cookieParser());
 
   if (!env.isTest) {
     app.use(morgan(env.isProduction ? 'combined' : 'dev'));
@@ -34,7 +39,11 @@ export default function createApp({ db, env, logger = console }) {
     swaggerUi.serve,
     swaggerUi.setup(openapi, { customSiteTitle: 'TaskFlow API' }),
   );
-  app.use('/api/v1', createApiRouter(createContainer({ db, env })));
+  app.use(
+    '/api/v1',
+    createCheckOrigin(env.corsOrigins),
+    createApiRouter(createContainer({ db, env })),
+  );
 
   app.use(notFound);
   app.use(createErrorHandler({ logger, exposeStack: !env.isProduction }));

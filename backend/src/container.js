@@ -23,6 +23,7 @@ import createAuthenticate from './middlewares/authenticate.js';
 import createPasswordHasher from './utils/password.js';
 import createTokenService from './utils/token.js';
 import { withTransaction } from './utils/transaction.js';
+import { authCookieOptions } from './utils/authCookie.js';
 
 /** Wires repositories, services and controllers together. */
 export default function createContainer({ db, env }) {
@@ -81,7 +82,11 @@ export default function createContainer({ db, env }) {
       commentService,
     },
     authenticate: createAuthenticate(tokenService),
-    authController: createAuthController(authService),
+    authController: createAuthController({
+      authService,
+      tokenService,
+      cookieOptions: authCookieOptions(env),
+    }),
     workspaceController: createWorkspaceController(workspaceService),
     projectController: createProjectController(projectService),
     taskController: createTaskController(taskService),

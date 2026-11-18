@@ -1,6 +1,13 @@
 import request from 'supertest';
+import { AUTH_COOKIE } from '../../src/utils/authCookie.js';
 
 let counter = 0;
+
+/** Reads the auth token from a response's Set-Cookie header. */
+export function tokenFromResponse(res) {
+  const header = [res.headers['set-cookie'] ?? []].flat().find((c) => c.startsWith(AUTH_COOKIE));
+  return header ? header.split(';')[0].slice(AUTH_COOKIE.length + 1) : null;
+}
 
 /** Registers a new user through the API and returns { user, token }. */
 export async function createUser(app, overrides = {}) {
@@ -15,12 +22,12 @@ export async function createUser(app, overrides = {}) {
   if (res.status !== 201) {
     throw new Error(`createUser failed: ${res.status} ${JSON.stringify(res.body)}`);
   }
-  return { user: res.body.data.user, token: res.body.data.accessToken };
+  return { user: res.body.data.user, token: tokenFromResponse(res) };
 }
 
-/** Returns a supertest agent-like helper that sends the Bearer token. */
+/** Request helper that sends the auth cookie. */
 export function as(app, token) {
-  const withAuth = (req) => req.set('Authorization', `Bearer ${token}`);
+  const withAuth = (req) => req.set('Cookie', `${AUTH_COOKIE}=${token}`);
   return {
     get: (url) => withAuth(request(app).get(url)),
     post: (url) => withAuth(request(app).post(url)),

@@ -5,7 +5,7 @@
 
 REST API for team task management: workspaces, members, projects, tasks, comments and activity history.
 
-Authenticate with `POST /auth/login`, then send `Authorization: Bearer <accessToken>`.
+`POST /auth/login` sets an httpOnly `taskflow_token` cookie (SameSite=Lax) that the browser sends automatically; the token is never exposed to JavaScript. State-changing requests from origins other than the API and the configured frontend are rejected.
 
 Base URL: `/api/v1`
 
@@ -30,29 +30,37 @@ Error: `{ "success": false, "data": null, "message": "...", "errors": [{ "field"
 
 ### POST `/auth/register`
 
-Register a new account.
+Register a new account and start a session.
 
 **Auth:** none
 
 **Body:** [RegisterInput](#registerinput)
 
-**Responses:** `201` User registered → `data`: AuthResult; `400` Validation failed or business rule violated; `409` Conflict with existing data
+**Responses:** `201` User registered; auth cookie set → `data`: AuthResult; `400` Validation failed or business rule violated; `409` Conflict with existing data
 
 ### POST `/auth/login`
 
-Log in and receive an access token.
+Log in; sets the httpOnly auth cookie.
 
 **Auth:** none
 
 **Body:** [LoginInput](#logininput)
 
-**Responses:** `200` Logged in → `data`: AuthResult; `400` Validation failed or business rule violated; `401` Missing, invalid or expired token
+**Responses:** `200` Logged in; auth cookie set → `data`: AuthResult; `400` Validation failed or business rule violated; `401` Missing, invalid or expired token
+
+### POST `/auth/logout`
+
+Log out by clearing the auth cookie.
+
+**Auth:** none
+
+**Responses:** `204` Cookie cleared
 
 ### GET `/auth/me`
 
 Get the current user.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 **Responses:** `200` Current user → `data`: User; `401` Missing, invalid or expired token
 
@@ -62,7 +70,7 @@ Get the current user.
 
 List workspaces the current user belongs to.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 **Responses:** `200` Workspaces → `data`: Workspace[]; `401` Missing, invalid or expired token
 
@@ -70,7 +78,7 @@ List workspaces the current user belongs to.
 
 Create a workspace (creator becomes OWNER).
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 **Body:** [WorkspaceInput](#workspaceinput)
 
@@ -82,7 +90,7 @@ Get workspace detail with members.
 
 Any member.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -96,7 +104,7 @@ Update a workspace.
 
 OWNER or ADMIN.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -112,7 +120,7 @@ Delete a workspace and everything in it.
 
 OWNER only.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -128,7 +136,7 @@ Add a member by email.
 
 OWNER or ADMIN. Only the OWNER can add ADMINs.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -144,7 +152,7 @@ Change a member's role.
 
 OWNER only. The OWNER's own role cannot be changed.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -161,7 +169,7 @@ Remove a member or leave the workspace.
 
 OWNER removes anyone except themselves, ADMIN removes MEMBERs, anyone can leave. The OWNER cannot be removed. The member's tasks in this workspace are unassigned.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -176,7 +184,7 @@ OWNER removes anyone except themselves, ADMIN removes MEMBERs, anyone can leave.
 
 List projects of a workspace.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -190,7 +198,7 @@ Create a project in a workspace.
 
 OWNER or ADMIN of the workspace.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 **Body:** [ProjectInput](#projectinput)
 
@@ -200,7 +208,7 @@ OWNER or ADMIN of the workspace.
 
 Get a project.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -214,7 +222,7 @@ Update a project.
 
 OWNER or ADMIN.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -230,7 +238,7 @@ Delete a project and its tasks.
 
 OWNER or ADMIN.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -244,7 +252,7 @@ OWNER or ADMIN.
 
 List tasks with filters, search, sorting and pagination.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -268,7 +276,7 @@ Create a task.
 
 Any workspace member.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 **Body:** [TaskInput](#taskinput)
 
@@ -278,7 +286,7 @@ Any workspace member.
 
 Get a task.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -292,7 +300,7 @@ Update a task.
 
 OWNER, ADMIN, the creator or the assignee. Changed fields are recorded in the activity log.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -308,7 +316,7 @@ Delete a task.
 
 OWNER, ADMIN or the creator.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -320,7 +328,7 @@ OWNER, ADMIN or the creator.
 
 Get the change history of a task (newest first).
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -336,7 +344,7 @@ Get the change history of a task (newest first).
 
 List comments of a task (oldest first).
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -350,7 +358,7 @@ List comments of a task (oldest first).
 
 Add a comment.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -366,7 +374,7 @@ Edit a comment.
 
 Author only.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -382,7 +390,7 @@ Delete a comment.
 
 The author, OWNER or ADMIN.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -396,7 +404,7 @@ The author, OWNER or ADMIN.
 
 Workspace task statistics and per-project progress.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |
@@ -408,7 +416,7 @@ Workspace task statistics and per-project progress.
 
 Project task counts by status and progress.
 
-**Auth:** Bearer token
+**Auth:** auth cookie
 
 | Parameter | In | Type | Notes |
 | --- | --- | --- | --- |

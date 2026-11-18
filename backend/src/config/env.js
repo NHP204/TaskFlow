@@ -28,6 +28,9 @@ const env = Object.freeze({
     expiresIn: process.env.JWT_EXPIRES_IN || '1h',
   },
   bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
+  cookieSecure: process.env.COOKIE_SECURE
+    ? process.env.COOKIE_SECURE === 'true'
+    : nodeEnv === 'production',
   corsOrigins: (process.env.CORS_ORIGIN || '')
     .split(',')
     .map((origin) => origin.trim())

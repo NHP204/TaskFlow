@@ -7,6 +7,7 @@ export default function createAuthRouter({ authController, authenticate }) {
 
   router.post('/register', validate(registerSchema), authController.register);
   router.post('/login', validate(loginSchema), authController.login);
+  router.post('/logout', authController.logout);
   router.get('/me', authenticate, authController.me);
 
   return router;

@@ -13,6 +13,10 @@ export default function createTokenService({ secret, expiresIn }) {
       });
     },
 
+    expiresAt(token) {
+      return new Date(jwt.decode(token).exp * 1000);
+    },
+
     /** Returns the user id from a valid token, otherwise throws 401. */
     verify(token) {
       let payload;

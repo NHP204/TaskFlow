@@ -39,7 +39,7 @@ const paginationParams = [
 const op = (tag, summary, spec) => ({
   tags: [tag],
   summary,
-  security: [{ bearerAuth: [] }],
+  security: [{ cookieAuth: [] }],
   ...spec,
 });
 
@@ -80,7 +80,9 @@ const openapi = {
     version: '1.0.0',
     description:
       'REST API for team task management: workspaces, members, projects, tasks, comments and activity history.\n\n' +
-      'Authenticate with `POST /auth/login`, then send `Authorization: Bearer <accessToken>`.',
+      '`POST /auth/login` sets an httpOnly `taskflow_token` cookie (SameSite=Lax) that the browser ' +
+      'sends automatically; the token is never exposed to JavaScript. ' +
+      'State-changing requests from origins other than the API and the configured frontend are rejected.',
   },
   servers: [{ url: '/api/v1' }],
   tags: [
@@ -95,7 +97,7 @@ const openapi = {
   ],
   components: {
     securitySchemes: {
-      bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      cookieAuth: { type: 'apiKey', in: 'cookie', name: 'taskflow_token' },
     },
     responses: {
       E400: errorResponse('Validation failed or business rule violated', {
@@ -171,7 +173,7 @@ const openapi = {
       },
       AuthResult: {
         type: 'object',
-        properties: { user: ref('User'), accessToken: { type: 'string' } },
+        properties: { user: ref('User') },
       },
       Workspace: {
         type: 'object',
@@ -412,10 +414,10 @@ const openapi = {
     '/auth/register': {
       post: {
         tags: ['Auth'],
-        summary: 'Register a new account',
+        summary: 'Register a new account and start a session',
         requestBody: body('RegisterInput'),
         responses: {
-          ...ok('User registered', ref('AuthResult'), { status: 201 }),
+          ...ok('User registered; auth cookie set', ref('AuthResult'), { status: 201 }),
           ...errors(400, 409),
         },
       },
@@ -423,9 +425,16 @@ const openapi = {
     '/auth/login': {
       post: {
         tags: ['Auth'],
-        summary: 'Log in and receive an access token',
+        summary: 'Log in; sets the httpOnly auth cookie',
         requestBody: body('LoginInput'),
-        responses: { ...ok('Logged in', ref('AuthResult')), ...errors(400, 401) },
+        responses: { ...ok('Logged in; auth cookie set', ref('AuthResult')), ...errors(400, 401) },
+      },
+    },
+    '/auth/logout': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Log out by clearing the auth cookie',
+        responses: noContent('Cookie cleared'),
       },
     },
     '/auth/me': {

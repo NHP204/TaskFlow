@@ -1,12 +1,12 @@
 import ApiError from '../utils/ApiError.js';
+import { AUTH_COOKIE } from '../utils/authCookie.js';
 
-/** Requires a Bearer token and sets req.user = { id }. */
+/** Requires a valid token in the auth cookie and sets req.user = { id }. */
 export default function createAuthenticate(tokenService) {
   return (req, res, next) => {
-    const [scheme, token] = (req.get('authorization') || '').split(' ');
-
-    if (scheme !== 'Bearer' || !token) {
-      return next(ApiError.unauthorized('Missing or invalid Authorization header'));
+    const token = req.cookies?.[AUTH_COOKIE];
+    if (!token) {
+      return next(ApiError.unauthorized('Authentication required'));
     }
 
     req.user = { id: tokenService.verify(token) };
