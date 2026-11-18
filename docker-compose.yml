@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # Only started with: docker compose --profile app up -d --build
+  # backend and frontend only start with: docker compose --profile app up -d --build
   backend:
     profiles: ["app"]
     build: ./backend
@@ -33,9 +33,21 @@ services:
       JWT_SECRET: ${JWT_SECRET:-}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
-      COOKIE_SECURE: ${COOKIE_SECURE:-}
+      # Local Docker runs over plain HTTP; set true behind HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     ports:
       - "${BACKEND_PORT:-3000}:3000"
+
+  frontend:
+    profiles: ["app"]
+    build: ./frontend
+    container_name: taskflow-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
 
 volumes:
   postgres-data:
