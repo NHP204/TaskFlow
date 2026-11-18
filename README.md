@@ -53,12 +53,33 @@ npm run dev
 
 Base URL: `/api/v1`. Endpoint cần đăng nhập gửi header `Authorization: Bearer <accessToken>`.
 
-| Method | Endpoint         | Auth | Mô tả                       |
-| ------ | ---------------- | ---- | --------------------------- |
-| GET    | `/health`        |      | Kiểm tra server và database |
-| POST   | `/auth/register` |      | Đăng ký                     |
-| POST   | `/auth/login`    |      | Đăng nhập, nhận JWT         |
-| GET    | `/auth/me`       | ✓    | Thông tin user hiện tại     |
+| Method | Endpoint                          | Auth | Mô tả                                     |
+| ------ | --------------------------------- | ---- | ----------------------------------------- |
+| GET    | `/health`                         |      | Kiểm tra server và database               |
+| POST   | `/auth/register`                  |      | Đăng ký                                   |
+| POST   | `/auth/login`                     |      | Đăng nhập, nhận JWT                       |
+| GET    | `/auth/me`                        | ✓    | Thông tin user hiện tại                   |
+| POST   | `/workspaces`                     | ✓    | Tạo workspace (người tạo là OWNER)        |
+| GET    | `/workspaces`                     | ✓    | Danh sách workspace của user              |
+| GET    | `/workspaces/:id`                 | ✓    | Chi tiết workspace và thành viên          |
+| PATCH  | `/workspaces/:id`                 | ✓    | Cập nhật (OWNER, ADMIN)                   |
+| DELETE | `/workspaces/:id`                 | ✓    | Xóa (OWNER)                               |
+| POST   | `/workspaces/:id/members`         | ✓    | Thêm thành viên theo email (OWNER, ADMIN) |
+| PATCH  | `/workspaces/:id/members/:userId` | ✓    | Đổi vai trò (OWNER)                       |
+| DELETE | `/workspaces/:id/members/:userId` | ✓    | Xóa thành viên hoặc tự rời workspace      |
+
+### Phân quyền trong workspace
+
+| Hành động       | OWNER | ADMIN      | MEMBER       |
+| --------------- | ----- | ---------- | ------------ |
+| Xem workspace   | ✓     | ✓          | ✓            |
+| Sửa workspace   | ✓     | ✓          |              |
+| Xóa workspace   | ✓     |            |              |
+| Thêm thành viên | ✓     | chỉ MEMBER |              |
+| Đổi vai trò     | ✓     |            |              |
+| Xóa thành viên  | ✓     | chỉ MEMBER | chỉ bản thân |
+
+OWNER không thể bị xóa hoặc đổi vai trò. User không phải thành viên nhận `403`.
 
 ## Tài liệu
 
