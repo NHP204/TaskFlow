@@ -5,8 +5,13 @@ import {
   projectIdSchema,
   updateProjectSchema,
 } from '../validators/project.validator.js';
+import { listTasksSchema } from '../validators/task.validator.js';
 
-export default function createProjectRouter({ projectController: c, authenticate }) {
+export default function createProjectRouter({
+  projectController: c,
+  taskController,
+  authenticate,
+}) {
   const router = Router();
 
   router.use(authenticate);
@@ -15,6 +20,8 @@ export default function createProjectRouter({ projectController: c, authenticate
   router.get('/:id', validate(projectIdSchema), c.getById);
   router.patch('/:id', validate(updateProjectSchema), c.update);
   router.delete('/:id', validate(projectIdSchema), c.delete);
+
+  router.get('/:id/tasks', validate(listTasksSchema), taskController.listByProject);
 
   return router;
 }

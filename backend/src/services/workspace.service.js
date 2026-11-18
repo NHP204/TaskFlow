@@ -6,6 +6,7 @@ export default function createWorkspaceService({
   workspaceRepository,
   memberRepository,
   userRepository,
+  taskRepository,
   workspaceAccess,
   runInTransaction,
 }) {
@@ -105,7 +106,11 @@ export default function createWorkspaceService({
         throw ApiError.forbidden();
       }
 
-      await memberRepository.remove(workspaceId, targetUserId);
+      // Former members keep no assigned tasks in this workspace.
+      await runInTransaction(async (client) => {
+        await memberRepository.remove(workspaceId, targetUserId, client);
+        await taskRepository.unassignUserInWorkspace(workspaceId, targetUserId, client);
+      });
     },
   };
 }

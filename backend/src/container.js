@@ -2,14 +2,17 @@ import createUserRepository from './repositories/user.repository.js';
 import createWorkspaceRepository from './repositories/workspace.repository.js';
 import createWorkspaceMemberRepository from './repositories/workspaceMember.repository.js';
 import createProjectRepository from './repositories/project.repository.js';
+import createTaskRepository from './repositories/task.repository.js';
 import createActivityRepository from './repositories/activity.repository.js';
 import createAuthService from './services/auth.service.js';
 import createWorkspaceAccess from './services/workspaceAccess.js';
 import createWorkspaceService from './services/workspace.service.js';
 import createProjectService from './services/project.service.js';
+import createTaskService from './services/task.service.js';
 import createAuthController from './controllers/auth.controller.js';
 import createWorkspaceController from './controllers/workspace.controller.js';
 import createProjectController from './controllers/project.controller.js';
+import createTaskController from './controllers/task.controller.js';
 import createAuthenticate from './middlewares/authenticate.js';
 import createPasswordHasher from './utils/password.js';
 import createTokenService from './utils/token.js';
@@ -23,6 +26,7 @@ export default function createContainer({ db, env }) {
   const workspaceRepository = createWorkspaceRepository(db);
   const memberRepository = createWorkspaceMemberRepository(db);
   const projectRepository = createProjectRepository(db);
+  const taskRepository = createTaskRepository(db);
   const activityRepository = createActivityRepository(db);
 
   const passwordHasher = createPasswordHasher({ saltRounds: env.bcryptSaltRounds });
@@ -34,11 +38,20 @@ export default function createContainer({ db, env }) {
     workspaceRepository,
     memberRepository,
     userRepository,
+    taskRepository,
     workspaceAccess,
     runInTransaction,
   });
   const projectService = createProjectService({
     projectRepository,
+    activityRepository,
+    workspaceAccess,
+    runInTransaction,
+  });
+  const taskService = createTaskService({
+    taskRepository,
+    projectRepository,
+    memberRepository,
     activityRepository,
     workspaceAccess,
     runInTransaction,
@@ -50,5 +63,6 @@ export default function createContainer({ db, env }) {
     authController: createAuthController(authService),
     workspaceController: createWorkspaceController(workspaceService),
     projectController: createProjectController(projectService),
+    taskController: createTaskController(taskService),
   };
 }
