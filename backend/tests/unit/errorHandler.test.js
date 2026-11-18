@@ -1,5 +1,6 @@
-const createErrorHandler = require('../../src/middlewares/errorHandler');
-const ApiError = require('../../src/utils/ApiError');
+import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import createErrorHandler from '../../src/middlewares/errorHandler.js';
+import ApiError from '../../src/utils/ApiError.js';
 
 function mockRes() {
   const res = {};

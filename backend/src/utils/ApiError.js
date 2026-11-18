@@ -2,7 +2,7 @@
  * Operational error with an HTTP status. Thrown from any layer and turned into
  * the standard error response by the error handler middleware.
  */
-class ApiError extends Error {
+export default class ApiError extends Error {
   constructor(statusCode, message, errors = null) {
     super(message);
     this.name = 'ApiError';
@@ -30,5 +30,3 @@ class ApiError extends Error {
     return new ApiError(409, message, errors);
   }
 }
-
-module.exports = ApiError;

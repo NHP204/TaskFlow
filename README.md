@@ -21,7 +21,7 @@ taskflow/
 
 ## Chạy backend (môi trường phát triển)
 
-Yêu cầu: Node.js >= 20, Docker.
+Yêu cầu: Node.js >= 20.11, Docker. Backend dùng ES Modules (`"type": "module"`).
 
 ```bash
 # 1. Khởi động PostgreSQL (tạo sẵn 2 database: taskflow_dev và taskflow_test)

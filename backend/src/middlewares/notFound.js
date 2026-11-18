@@ -1,7 +1,5 @@
-const ApiError = require('../utils/ApiError');
+import ApiError from '../utils/ApiError.js';
 
-function notFound(req, res, next) {
+export default function notFound(req, res, next) {
   next(ApiError.notFound(`Route ${req.method} ${req.originalUrl} not found`));
 }
-
-module.exports = notFound;

@@ -1,7 +1,8 @@
-const request = require('supertest');
-const env = require('../../src/config/env');
-const db = require('../../src/config/database');
-const createApp = require('../../src/app');
+import { describe, it, expect, afterAll } from '@jest/globals';
+import request from 'supertest';
+import env from '../../src/config/env.js';
+import db from '../../src/config/database.js';
+import createApp from '../../src/app.js';
 
 const app = createApp({ db, env, logger: { error: () => {} } });
 

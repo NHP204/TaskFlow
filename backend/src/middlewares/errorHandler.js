@@ -1,5 +1,5 @@
-const ApiError = require('../utils/ApiError');
-const { sendError } = require('../utils/response');
+import ApiError from '../utils/ApiError.js';
+import { sendError } from '../utils/response.js';
 
 // PostgreSQL error codes that map to client errors. Services should raise
 // explicit ApiErrors first; this is a safety net for races (e.g. two requests
@@ -11,7 +11,7 @@ const PG_ERROR_MAP = {
   '22P02': { statusCode: 400, message: 'Invalid input syntax' }, // invalid_text_representation
 };
 
-function createErrorHandler({ logger = console, exposeStack = false } = {}) {
+export default function createErrorHandler({ logger = console, exposeStack = false } = {}) {
   // Express recognizes error handlers by their 4-argument signature.
   // eslint-disable-next-line no-unused-vars
   return function errorHandler(err, req, res, next) {
@@ -42,5 +42,3 @@ function createErrorHandler({ logger = console, exposeStack = false } = {}) {
     return sendError(res, { statusCode: 500, message: 'Internal server error' });
   };
 }
-
-module.exports = createErrorHandler;

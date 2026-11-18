@@ -5,16 +5,15 @@
  *   node scripts/migrate.js up      # apply all pending migrations
  *   node scripts/migrate.js down    # roll back the last migration
  */
-const path = require('path');
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { runner } from 'node-pg-migrate';
+import env from '../src/config/env.js';
 
-async function migrate(direction = 'up', { log = console.log } = {}) {
-  const env = require('../src/config/env');
-  // node-pg-migrate is ESM-only; load it from CommonJS via dynamic import.
-  const { runner } = await import('node-pg-migrate');
-
+export default function migrate(direction = 'up', { log = console.log } = {}) {
   return runner({
     databaseUrl: env.databaseUrl,
-    dir: path.resolve(__dirname, '../migrations'),
+    dir: path.resolve(import.meta.dirname, '../migrations'),
     direction,
     count: direction === 'down' ? 1 : Infinity,
     migrationsTable: 'pgmigrations',
@@ -22,18 +21,18 @@ async function migrate(direction = 'up', { log = console.log } = {}) {
   });
 }
 
-if (require.main === module) {
+const isCli = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isCli) {
   const direction = process.argv[2] || 'up';
   if (!['up', 'down'].includes(direction)) {
     console.error('Usage: node scripts/migrate.js [up|down]');
     process.exit(1);
   }
-  migrate(direction)
-    .then(() => process.exit(0))
-    .catch((err) => {
-      console.error('Migration failed:', err.message);
-      process.exit(1);
-    });
+  try {
+    await migrate(direction);
+  } catch (err) {
+    console.error('Migration failed:', err.message);
+    process.exit(1);
+  }
 }
-
-module.exports = migrate;

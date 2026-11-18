@@ -1,12 +1,12 @@
-const path = require('path');
-const dotenv = require('dotenv');
+import path from 'node:path';
+import dotenv from 'dotenv';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
 // .env.test for the test suite, .env otherwise. Real environment variables
 // (e.g. set by CI or the container) always win over the file.
 dotenv.config({
-  path: path.resolve(__dirname, '../..', nodeEnv === 'test' ? '.env.test' : '.env'),
+  path: path.resolve(import.meta.dirname, '../..', nodeEnv === 'test' ? '.env.test' : '.env'),
   quiet: true,
 });
 
@@ -30,4 +30,4 @@ const env = Object.freeze({
     .filter(Boolean),
 });
 
-module.exports = env;
+export default env;

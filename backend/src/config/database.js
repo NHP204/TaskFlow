@@ -1,7 +1,7 @@
-const { Pool } = require('pg');
-const env = require('./env');
+import pg from 'pg';
+import env from './env.js';
 
-const pool = new Pool({
+export const pool = new pg.Pool({
   connectionString: env.databaseUrl,
   max: env.isTest ? 5 : 10,
 });
@@ -11,9 +11,11 @@ pool.on('error', (err) => {
   console.error('Unexpected PostgreSQL pool error:', err.message);
 });
 
-module.exports = {
+const db = {
   pool,
   /** Run a parameterized query on the shared pool. */
   query: (text, params) => pool.query(text, params),
   close: () => pool.end(),
 };
+
+export default db;

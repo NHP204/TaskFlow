@@ -1,4 +1,5 @@
-const { withTransaction } = require('../../src/utils/transaction');
+import { describe, it, expect, jest } from '@jest/globals';
+import { withTransaction } from '../../src/utils/transaction.js';
 
 function mockPool() {
   const client = { query: jest.fn().mockResolvedValue({}), release: jest.fn() };

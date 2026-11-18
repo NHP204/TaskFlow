@@ -1,17 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
-const createApiRouter = require('./routes');
-const notFound = require('./middlewares/notFound');
-const createErrorHandler = require('./middlewares/errorHandler');
+import createApiRouter from './routes/index.js';
+import notFound from './middlewares/notFound.js';
+import createErrorHandler from './middlewares/errorHandler.js';
 
 /**
  * Builds the Express app. Dependencies are injected so tests can supply
  * their own database / logger instead of the real ones.
  */
-function createApp({ db, env, logger = console }) {
+export default function createApp({ db, env, logger = console }) {
   const app = express();
 
   app.disable('x-powered-by');
@@ -30,5 +30,3 @@ function createApp({ db, env, logger = console }) {
 
   return app;
 }
-
-module.exports = createApp;

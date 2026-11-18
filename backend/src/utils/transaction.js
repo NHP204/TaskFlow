@@ -8,7 +8,7 @@
  * @param {(client: import('pg').PoolClient) => Promise<T>} work
  * @returns {Promise<T>}
  */
-async function withTransaction(pool, work) {
+export async function withTransaction(pool, work) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -22,5 +22,3 @@ async function withTransaction(pool, work) {
     client.release();
   }
 }
-
-module.exports = { withTransaction };
