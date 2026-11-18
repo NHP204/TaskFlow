@@ -23,7 +23,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "docs": "node scripts/generate-api-docs.js",
-    "docs:check": "node scripts/generate-api-docs.js --check"
+    "docs:check": "node scripts/generate-api-docs.js --check",
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -73,6 +73,13 @@ export default function createContainer({ db, env }) {
 
   return {
     db,
+    services: {
+      authService,
+      workspaceService,
+      projectService,
+      taskService,
+      commentService,
+    },
     authenticate: createAuthenticate(tokenService),
     authController: createAuthController(authService),
     workspaceController: createWorkspaceController(workspaceService),
