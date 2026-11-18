@@ -17,10 +17,8 @@ export default function createApp({ db, env, logger = console }) {
   app.disable('x-powered-by');
   app.use(
     helmet({
-      // Plain HTTP in development must not be upgraded to HTTPS.
-      contentSecurityPolicy: {
-        directives: { upgradeInsecureRequests: env.isProduction ? [] : null },
-      },
+      // Keep Swagger UI working over plain HTTP (local Docker); HSTS covers HTTPS deployments.
+      contentSecurityPolicy: { directives: { upgradeInsecureRequests: null } },
     }),
   );
   app.use(cors({ origin: env.corsOrigins.length > 0 ? env.corsOrigins : false }));

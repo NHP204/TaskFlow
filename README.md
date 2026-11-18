@@ -1,5 +1,7 @@
 # TaskFlow — Team Task Management System
 
+[![CI](https://github.com/NHP204/TaskFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/NHP204/TaskFlow/actions/workflows/ci.yml)
+
 Ứng dụng quản lý công việc nhóm: workspace, thành viên, project, task và lịch sử hoạt động.
 
 ## Công nghệ
@@ -59,6 +61,26 @@ Tài khoản demo sau khi seed (mật khẩu `password123`): `owner@taskflow.dev
 | `npm run format`       | Format code bằng Prettier                            |
 | `npm run seed`         | Reset database dev và nạp dữ liệu demo               |
 | `npm run docs`         | Validate OpenAPI và sinh `docs/api-specification.md` |
+
+## Chạy bằng Docker
+
+Chạy cả backend và PostgreSQL trong container (backend tự chạy migration khi khởi động):
+
+```bash
+cp .env.example .env        # đặt JWT_SECRET (bắt buộc)
+docker compose --profile app up -d --build
+```
+
+API ở http://localhost:3000, Swagger UI ở http://localhost:3000/api-docs. Lệnh `docker compose up -d`
+không có `--profile app` chỉ chạy PostgreSQL, dùng khi phát triển với `npm run dev`.
+
+## CI
+
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy trên mọi push và pull request:
+
+- ESLint, Prettier check, kiểm tra `docs/api-specification.md` khớp với OpenAPI spec
+- Toàn bộ unit và integration test với PostgreSQL service, kèm báo cáo coverage
+- Build Docker image của backend
 
 ## API
 
