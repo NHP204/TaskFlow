@@ -50,7 +50,7 @@ function successData(response) {
 function renderOperation(method, route, item, operation) {
   const lines = [`### ${method.toUpperCase()} \`${route}\``, '', operation.summary + '.', ''];
   if (operation.description) lines.push(operation.description, '');
-  lines.push(`**Auth:** ${operation.security ? 'Bearer token' : 'none'}`, '');
+  lines.push(`**Auth:** ${operation.security ? 'auth cookie' : 'none'}`, '');
 
   const params = [...(item.parameters ?? []), ...(operation.parameters ?? [])];
   if (params.length > 0) {

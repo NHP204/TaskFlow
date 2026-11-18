@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import env from '../../src/config/env.js';
 import createApp from '../../src/app.js';
 import db, { resetDatabase } from '../helpers/db.js';
+import { as, tokenFromResponse } from '../helpers/auth.js';
 
 const app = createApp({ db, env, logger: { error: () => {} } });
 
@@ -11,27 +12,33 @@ const alice = { email: 'alice@example.com', password: 'secret123', fullName: 'Al
 
 const register = (body = alice) => request(app).post('/api/v1/auth/register').send(body);
 const login = (body) => request(app).post('/api/v1/auth/login').send(body);
-const me = (token) => {
-  const req = request(app).get('/api/v1/auth/me');
-  return token ? req.set('Authorization', `Bearer ${token}`) : req;
-};
+const me = (token) =>
+  token ? as(app, token).get('/api/v1/auth/me') : request(app).get('/api/v1/auth/me');
+
+const authCookie = (res) => [res.headers['set-cookie'] ?? []].flat().join('\n');
 
 beforeEach(() => resetDatabase());
 afterAll(() => db.close());
 
 describe('POST /api/v1/auth/register', () => {
-  it('creates a user and returns a token (201)', async () => {
+  it('creates a user and sets an httpOnly auth cookie (201)', async () => {
     const res = await register();
 
     expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.user).toMatchObject({
-      id: 1,
-      email: alice.email,
-      fullName: alice.fullName,
-    });
+    expect(res.body.data).toEqual({ user: expect.objectContaining({ id: 1, email: alice.email }) });
     expect(res.body.data.user).not.toHaveProperty('passwordHash');
-    expect(typeof res.body.data.accessToken).toBe('string');
+
+    const cookie = authCookie(res);
+    expect(cookie).toMatch(/^taskflow_token=/);
+    expect(cookie).toMatch(/HttpOnly/);
+    expect(cookie).toMatch(/SameSite=Lax/);
+    expect(cookie).toMatch(/Path=\/api/);
+    expect(cookie).toMatch(/Expires=/);
+  });
+
+  it('never returns the token in the response body', async () => {
+    const res = await register();
+    expect(JSON.stringify(res.body)).not.toContain(tokenFromResponse(res));
   });
 
   it('stores a bcrypt hash, never the plain password', async () => {
@@ -64,20 +71,21 @@ describe('POST /api/v1/auth/register', () => {
 describe('POST /api/v1/auth/login', () => {
   beforeEach(() => register());
 
-  it('returns a token for valid credentials (200)', async () => {
+  it('sets the auth cookie for valid credentials (200)', async () => {
     const res = await login({ email: alice.email, password: alice.password });
 
     expect(res.status).toBe(200);
     expect(res.body.data.user.email).toBe(alice.email);
     expect(res.body.data.user).not.toHaveProperty('passwordHash');
-    expect(typeof res.body.data.accessToken).toBe('string');
+    expect(tokenFromResponse(res)).toEqual(expect.any(String));
   });
 
-  it('rejects a wrong password (401)', async () => {
+  it('rejects a wrong password (401) without setting a cookie', async () => {
     const res = await login({ email: alice.email, password: 'wrong-password' });
 
     expect(res.status).toBe(401);
     expect(res.body.message).toBe('Invalid email or password');
+    expect(res.headers['set-cookie']).toBeUndefined();
   });
 
   it('rejects an unknown email with the same message (401)', async () => {
@@ -93,24 +101,33 @@ describe('POST /api/v1/auth/login', () => {
   });
 });
 
+describe('POST /api/v1/auth/logout', () => {
+  it('clears the auth cookie (204)', async () => {
+    const res = await request(app).post('/api/v1/auth/logout');
+
+    expect(res.status).toBe(204);
+    expect(authCookie(res)).toMatch(/^taskflow_token=;.*Expires=Thu, 01 Jan 1970/);
+  });
+});
+
 describe('GET /api/v1/auth/me', () => {
-  it('returns the current user for a valid token (200)', async () => {
-    const { body } = await register();
-    const res = await me(body.data.accessToken);
+  it('returns the current user for a valid cookie (200)', async () => {
+    const res = await me(tokenFromResponse(await register()));
 
     expect(res.status).toBe(200);
     expect(res.body.data).toMatchObject({ id: 1, email: alice.email, fullName: alice.fullName });
     expect(res.body.data).not.toHaveProperty('passwordHash');
   });
 
-  it('rejects a request without a token (401)', async () => {
+  it('rejects a request without the cookie (401)', async () => {
     const res = await me();
     expect(res.status).toBe(401);
-    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe('Authentication required');
   });
 
-  it('rejects a malformed Authorization header (401)', async () => {
-    const res = await request(app).get('/api/v1/auth/me').set('Authorization', 'Token abc');
+  it('ignores Bearer tokens: only the cookie authenticates', async () => {
+    const token = tokenFromResponse(await register());
+    const res = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(401);
   });
 
@@ -124,10 +141,41 @@ describe('GET /api/v1/auth/me', () => {
   });
 
   it('rejects a token for a user that no longer exists (401)', async () => {
-    const { body } = await register();
+    const token = tokenFromResponse(await register());
     await resetDatabase();
 
-    const res = await me(body.data.accessToken);
-    expect(res.status).toBe(401);
+    expect((await me(token)).status).toBe(401);
+  });
+});
+
+describe('Origin check (CSRF defense)', () => {
+  it('rejects state-changing requests from a foreign origin (403)', async () => {
+    const token = tokenFromResponse(await register());
+
+    const res = await as(app, token)
+      .post('/api/v1/workspaces')
+      .set('Origin', 'https://evil.example')
+      .send({ name: 'Hacked' });
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toBe('Origin not allowed');
+  });
+
+  it('accepts the configured frontend origin and requests without Origin', async () => {
+    const token = tokenFromResponse(await register());
+
+    const fromFrontend = await as(app, token)
+      .post('/api/v1/workspaces')
+      .set('Origin', env.corsOrigins[0])
+      .send({ name: 'Ok' });
+    expect(fromFrontend.status).toBe(201);
+
+    const noOrigin = await as(app, token).post('/api/v1/workspaces').send({ name: 'Ok 2' });
+    expect(noOrigin.status).toBe(201);
+  });
+
+  it('does not block safe methods from other origins', async () => {
+    const res = await request(app).get('/api/v1/health').set('Origin', 'https://evil.example');
+    expect(res.status).toBe(200);
   });
 });

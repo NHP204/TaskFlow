@@ -84,13 +84,14 @@ GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy t
 
 ## API
 
-Base URL: `/api/v1`. Endpoint cần đăng nhập gửi header `Authorization: Bearer <accessToken>`.
+Base URL: `/api/v1`. Đăng nhập hoặc đăng ký đặt cookie `taskflow_token` (`HttpOnly`, `SameSite=Lax`, `Path=/api`); trình duyệt tự gửi cookie, JavaScript không đọc được token. Request thay đổi dữ liệu từ origin lạ bị từ chối (`403`).
 
 | Method | Endpoint                          | Auth | Mô tả                                               |
 | ------ | --------------------------------- | ---- | --------------------------------------------------- |
 | GET    | `/health`                         |      | Kiểm tra server và database                         |
 | POST   | `/auth/register`                  |      | Đăng ký                                             |
-| POST   | `/auth/login`                     |      | Đăng nhập, nhận JWT                                 |
+| POST   | `/auth/login`                     |      | Đăng nhập, đặt cookie JWT                           |
+| POST   | `/auth/logout`                    |      | Đăng xuất, xóa cookie                               |
 | GET    | `/auth/me`                        | ✓    | Thông tin user hiện tại                             |
 | POST   | `/workspaces`                     | ✓    | Tạo workspace (người tạo là OWNER)                  |
 | GET    | `/workspaces`                     | ✓    | Danh sách workspace của user                        |
