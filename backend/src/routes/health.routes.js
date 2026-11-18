@@ -1,7 +1,7 @@
-const { Router } = require('express');
-const { sendSuccess, sendError } = require('../utils/response');
+import { Router } from 'express';
+import { sendSuccess, sendError } from '../utils/response.js';
 
-function createHealthRouter({ db }) {
+export default function createHealthRouter({ db }) {
   const router = Router();
 
   router.get('/', async (req, res) => {
@@ -18,5 +18,3 @@ function createHealthRouter({ db }) {
 
   return router;
 }
-
-module.exports = createHealthRouter;

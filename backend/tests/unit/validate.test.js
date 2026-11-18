@@ -1,6 +1,7 @@
-const Joi = require('joi');
-const validate = require('../../src/middlewares/validate');
-const ApiError = require('../../src/utils/ApiError');
+import { describe, it, expect, jest } from '@jest/globals';
+import Joi from 'joi';
+import validate from '../../src/middlewares/validate.js';
+import ApiError from '../../src/utils/ApiError.js';
 
 describe('validate middleware', () => {
   const middleware = validate({

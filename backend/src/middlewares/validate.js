@@ -1,4 +1,4 @@
-const ApiError = require('../utils/ApiError');
+import ApiError from '../utils/ApiError.js';
 
 const SOURCES = ['params', 'query', 'body'];
 
@@ -7,7 +7,7 @@ const SOURCES = ['params', 'query', 'body'];
  * Validated, type-coerced values are exposed on `req.validated[source]`
  * because Express 5 makes `req.query` read-only; `req.body` is also replaced.
  */
-function validate(schemas) {
+export default function validate(schemas) {
   return (req, res, next) => {
     const errors = [];
     req.validated = req.validated || {};
@@ -41,5 +41,3 @@ function validate(schemas) {
     return next();
   };
 }
-
-module.exports = validate;

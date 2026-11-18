@@ -1,6 +1,6 @@
-const env = require('./config/env');
-const db = require('./config/database');
-const createApp = require('./app');
+import env from './config/env.js';
+import db from './config/database.js';
+import createApp from './app.js';
 
 const app = createApp({ db, env });
 
