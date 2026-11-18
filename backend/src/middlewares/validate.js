@@ -2,11 +2,7 @@ import ApiError from '../utils/ApiError.js';
 
 const SOURCES = ['params', 'query', 'body'];
 
-/**
- * Validates request parts against Joi schemas: validate({ body, query, params }).
- * Validated, type-coerced values are exposed on `req.validated[source]`
- * because Express 5 makes `req.query` read-only; `req.body` is also replaced.
- */
+/** Validates params/query/body with Joi and stores the result in req.validated. */
 export default function validate(schemas) {
   return (req, res, next) => {
     const errors = [];

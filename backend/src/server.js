@@ -14,7 +14,6 @@ function shutdown(signal) {
     await db.close();
     process.exit(0);
   });
-  // Force exit if open connections do not close in time.
   setTimeout(() => process.exit(1), 10_000).unref();
 }
 

@@ -1,13 +1,4 @@
-/**
- * Runs `work(client)` inside a single transaction on a dedicated client.
- * Commits on success, rolls back on any error and rethrows it.
- * Repositories accept an optional `client` so they can join the transaction.
- *
- * @template T
- * @param {import('pg').Pool} pool
- * @param {(client: import('pg').PoolClient) => Promise<T>} work
- * @returns {Promise<T>}
- */
+/** Runs work(client) in a transaction: commit on success, rollback on error. */
 export async function withTransaction(pool, work) {
   const client = await pool.connect();
   try {

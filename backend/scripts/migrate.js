@@ -1,10 +1,4 @@
-/**
- * Migration CLI that reuses the app's env loading, so the same command works
- * for development (.env) and tests (NODE_ENV=test -> .env.test).
- *
- *   node scripts/migrate.js up      # apply all pending migrations
- *   node scripts/migrate.js down    # roll back the last migration
- */
+// Usage: node scripts/migrate.js [up|down]
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { runner } from 'node-pg-migrate';

@@ -7,13 +7,11 @@ export const pool = new pg.Pool({
 });
 
 pool.on('error', (err) => {
-  // An idle client errored (e.g. DB restarted). Log without connection details.
   console.error('Unexpected PostgreSQL pool error:', err.message);
 });
 
 const db = {
   pool,
-  /** Run a parameterized query on the shared pool. */
   query: (text, params) => pool.query(text, params),
   close: () => pool.end(),
 };

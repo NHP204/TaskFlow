@@ -69,7 +69,6 @@ describe('Database schema', () => {
     ]);
   });
 
-  // Runs inside a transaction that is always rolled back, so no data is left behind.
   async function inRolledBackTransaction(work) {
     const client = await db.pool.connect();
     try {
