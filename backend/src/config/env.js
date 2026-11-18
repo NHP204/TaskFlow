@@ -23,6 +23,11 @@ const env = Object.freeze({
   isTest: nodeEnv === 'test',
   port: Number(process.env.PORT) || 3000,
   databaseUrl: required('DATABASE_URL'),
+  jwt: {
+    secret: required('JWT_SECRET'),
+    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+  },
+  bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
   corsOrigins: (process.env.CORS_ORIGIN || '')
     .split(',')
     .map((origin) => origin.trim())

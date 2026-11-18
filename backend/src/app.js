@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import createContainer from './container.js';
 import createApiRouter from './routes/index.js';
 import notFound from './middlewares/notFound.js';
 import createErrorHandler from './middlewares/errorHandler.js';
@@ -20,7 +21,7 @@ export default function createApp({ db, env, logger = console }) {
     app.use(morgan(env.isProduction ? 'combined' : 'dev'));
   }
 
-  app.use('/api/v1', createApiRouter({ db, env }));
+  app.use('/api/v1', createApiRouter(createContainer({ db, env })));
 
   app.use(notFound);
   app.use(createErrorHandler({ logger, exposeStack: !env.isProduction }));

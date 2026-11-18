@@ -49,6 +49,17 @@ npm run dev
 | `npm run lint`         | Kiểm tra ESLint                                   |
 | `npm run format`       | Format code bằng Prettier                         |
 
+## API
+
+Base URL: `/api/v1`. Endpoint cần đăng nhập gửi header `Authorization: Bearer <accessToken>`.
+
+| Method | Endpoint         | Auth | Mô tả                       |
+| ------ | ---------------- | ---- | --------------------------- |
+| GET    | `/health`        |      | Kiểm tra server và database |
+| POST   | `/auth/register` |      | Đăng ký                     |
+| POST   | `/auth/login`    |      | Đăng nhập, nhận JWT         |
+| GET    | `/auth/me`       | ✓    | Thông tin user hiện tại     |
+
 ## Tài liệu
 
 - [Đặc tả dự án](docs/project-specification.md)
