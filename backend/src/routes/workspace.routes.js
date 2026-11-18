@@ -9,7 +9,11 @@ import {
   workspaceIdSchema,
 } from '../validators/workspace.validator.js';
 
-export default function createWorkspaceRouter({ workspaceController: c, authenticate }) {
+export default function createWorkspaceRouter({
+  workspaceController: c,
+  projectController,
+  authenticate,
+}) {
   const router = Router();
 
   router.use(authenticate);
@@ -23,6 +27,8 @@ export default function createWorkspaceRouter({ workspaceController: c, authenti
   router.post('/:id/members', validate(addMemberSchema), c.addMember);
   router.patch('/:id/members/:userId', validate(updateMemberSchema), c.updateMember);
   router.delete('/:id/members/:userId', validate(memberSchema), c.removeMember);
+
+  router.get('/:id/projects', validate(workspaceIdSchema), projectController.listByWorkspace);
 
   return router;
 }

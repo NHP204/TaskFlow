@@ -1,11 +1,15 @@
 import createUserRepository from './repositories/user.repository.js';
 import createWorkspaceRepository from './repositories/workspace.repository.js';
 import createWorkspaceMemberRepository from './repositories/workspaceMember.repository.js';
+import createProjectRepository from './repositories/project.repository.js';
+import createActivityRepository from './repositories/activity.repository.js';
 import createAuthService from './services/auth.service.js';
 import createWorkspaceAccess from './services/workspaceAccess.js';
 import createWorkspaceService from './services/workspace.service.js';
+import createProjectService from './services/project.service.js';
 import createAuthController from './controllers/auth.controller.js';
 import createWorkspaceController from './controllers/workspace.controller.js';
+import createProjectController from './controllers/project.controller.js';
 import createAuthenticate from './middlewares/authenticate.js';
 import createPasswordHasher from './utils/password.js';
 import createTokenService from './utils/token.js';
@@ -18,6 +22,8 @@ export default function createContainer({ db, env }) {
   const userRepository = createUserRepository(db);
   const workspaceRepository = createWorkspaceRepository(db);
   const memberRepository = createWorkspaceMemberRepository(db);
+  const projectRepository = createProjectRepository(db);
+  const activityRepository = createActivityRepository(db);
 
   const passwordHasher = createPasswordHasher({ saltRounds: env.bcryptSaltRounds });
   const tokenService = createTokenService(env.jwt);
@@ -31,11 +37,18 @@ export default function createContainer({ db, env }) {
     workspaceAccess,
     runInTransaction,
   });
+  const projectService = createProjectService({
+    projectRepository,
+    activityRepository,
+    workspaceAccess,
+    runInTransaction,
+  });
 
   return {
     db,
     authenticate: createAuthenticate(tokenService),
     authController: createAuthController(authService),
     workspaceController: createWorkspaceController(workspaceService),
+    projectController: createProjectController(projectService),
   };
 }

@@ -1,7 +1,6 @@
 import ApiError from '../utils/ApiError.js';
+import { emptyToNull } from '../utils/normalize.js';
 import { MANAGER_ROLES, ROLES } from '../utils/roles.js';
-
-const emptyToNull = (value) => (value === '' ? null : value);
 
 export default function createWorkspaceService({
   workspaceRepository,
