@@ -255,7 +255,20 @@ hoặc đổi vai trò. Khi một thành viên bị xóa, các task đang giao c
 - **Frontend:** test cho form đăng nhập, logic Kanban (cập nhật lạc quan và rollback), quyền hiển thị,
   định dạng.
 - **GitHub Actions** chạy trên mọi push và pull request: lint, Prettier, kiểm tra tài liệu API khớp
-  spec, test backend với PostgreSQL service kèm coverage, test và build frontend, build Docker image.
+  spec, test backend với PostgreSQL service kèm coverage, test và build frontend, build Docker image,
+  và `npm audit --omit=dev` (CI fail nếu dependency production có lỗ hổng từ mức moderate).
+
+### Bảo mật dependency
+
+- Dependency production của backend và frontend: `npm audit --omit=dev` báo **0 lỗ hổng**.
+- `glob` và `minimatch` (dùng bởi `node-pg-migrate`) được ép lên bản đã vá bằng `overrides` trong
+  `backend/package.json`.
+- Backend dùng `node --watch` thay cho nodemon, bớt một nhóm dependency.
+- `npm audit` đầy đủ vẫn báo lỗ hổng high
+  [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) (ReDoS trong `picomatch`)
+  qua Jest, Vite và Vitest. Advisory này **chưa có bản vá**. Các công cụ này chỉ chạy khi phát triển,
+  build và test, xử lý glob pattern từ cấu hình của dự án chứ không nhận input từ người dùng, và không
+  có trong image production hay bundle frontend. Sẽ cập nhật khi `picomatch` phát hành bản sửa.
 
 ## Ảnh chụp màn hình
 
