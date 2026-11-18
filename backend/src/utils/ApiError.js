@@ -1,7 +1,4 @@
-/**
- * Operational error with an HTTP status. Thrown from any layer and turned into
- * the standard error response by the error handler middleware.
- */
+/** HTTP error that errorHandler converts into a JSON response. */
 export default class ApiError extends Error {
   constructor(statusCode, message, errors = null) {
     super(message);

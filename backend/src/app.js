@@ -7,10 +7,7 @@ import createApiRouter from './routes/index.js';
 import notFound from './middlewares/notFound.js';
 import createErrorHandler from './middlewares/errorHandler.js';
 
-/**
- * Builds the Express app. Dependencies are injected so tests can supply
- * their own database / logger instead of the real ones.
- */
+/** Builds the Express app with injected dependencies. */
 export default function createApp({ db, env, logger = console }) {
   const app = express();
 

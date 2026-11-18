@@ -1,7 +1,3 @@
-/**
- * Helpers that enforce the response envelope:
- *   { success, data, message } and, for errors, { ..., errors }.
- */
 export function sendSuccess(
   res,
   { statusCode = 200, data = null, message = 'Success', meta } = {},

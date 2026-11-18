@@ -3,8 +3,7 @@ import dotenv from 'dotenv';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-// .env.test for the test suite, .env otherwise. Real environment variables
-// (e.g. set by CI or the container) always win over the file.
+// Loads .env.test when NODE_ENV=test, otherwise .env.
 dotenv.config({
   path: path.resolve(import.meta.dirname, '../..', nodeEnv === 'test' ? '.env.test' : '.env'),
   quiet: true,

@@ -1,2 +1,2 @@
--- Separate database for integration tests, isolated from development data.
+-- Test database
 CREATE DATABASE taskflow_test;
